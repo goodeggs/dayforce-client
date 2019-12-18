@@ -1,4 +1,4 @@
-from typing import Dict, Iterator, Optional, Tuple
+from typing import Dict, Iterator, Optional, Set, Tuple
 
 import attr
 import requests
@@ -55,48 +55,32 @@ class Dayforce(object):
         resp = self._get(url=url, params=kwargs)
         return DayforceResponse(client=self, params=kwargs, resp=resp)
 
-    def _paginate_and_yield(self, resp: DayforceResponse) -> Iterator[Tuple[Dict, DayforceResponse]]:
-        for page in resp:
-            for record in page.get("Data"):
-                yield record, page
-
-    def _paginate_and_yield_reports(self, resp: DayforceResponse) -> Iterator[Tuple[Dict, DayforceResponse]]:
-        for page in resp:
-            for row in page.get("Data").get("Rows"):
-                yield row, page
-
-    # Employee Raw Punches
-    def yield_employee_raw_punches(self, **kwargs):
-        req_params = {"filterTransactionStartTimeUTC", "filterTransactionEndTimeUTC"}
-        supplied_params = set(kwargs.keys())
+    def _check_required_params(self, req_params: Set[str], params: Dict):
+        supplied_params = set(params.keys())
         if not req_params.issubset(supplied_params):
             raise KeyError(f"Missing required query parameters: {req_params.difference(supplied_params)}")
 
-        resp = self._get_resource(resource='EmployeeRawPunches', **kwargs)
-        return self._paginate_and_yield(resp)
-
-    # Employee Punches
-    def yield_employee_punches(self, **kwargs):
+    def get_employee_raw_punches(self, **kwargs):
         req_params = {"filterTransactionStartTimeUTC", "filterTransactionEndTimeUTC"}
-        supplied_params = set(kwargs.keys())
-        if not req_params.issubset(supplied_params):
-            raise KeyError(f"Missing required query parameters: {req_params.difference(supplied_params)}")
+        self._check_required_params(req_params, params=kwargs)
+        return self._get_resource(resource='EmployeeRawPunches', **kwargs)
 
-        resp = self._get_resource(resource='EmployeePunches', **kwargs)
-        return self._paginate_and_yield(resp)
+    def get_employee_punches(self, **kwargs):
+        req_params = {"filterTransactionStartTimeUTC", "filterTransactionEndTimeUTC"}
+        self._check_required_params(req_params, params=kwargs)
+        return self._get_resource(resource='EmployeePunches', **kwargs)
 
-    # Employees
     def get_employees(self, **kwargs):
         return self._get_resource(resource='Employees', **kwargs)
-
-    def yield_employees(self, **kwargs):
-        resp = self._get_resource(resource='Employees', **kwargs)
-        return self._paginate_and_yield(resp)
 
     def get_employee_details(self, xrefcode: str, **kwargs):
         return self._get_resource(resource=f"Employees/{xrefcode}", **kwargs)
 
-    # Reports
+    def get_employee_schedules(self, xrefcode: str, **kwargs):
+        req_params = {"filterScheduleStartDate", "filterScheduleEndDate"}
+        self._check_required_params(req_params, params=kwargs)
+        return self._get_resource(resource=f"Employees/{xrefcode}/Schedules", **kwargs)
+
     def get_reports(self):
         return self._get_resource(resource='ReportMetadata')
 
@@ -105,7 +89,3 @@ class Dayforce(object):
 
     def get_report(self, xrefcode: str, **kwargs):
         return self._get_resource(resource=f"Reports/{xrefcode}", **kwargs)
-
-    def yield_report_rows(self, xrefcode: str, **kwargs):
-        resp = self._get_resource(resource=f"Reports/{xrefcode}", **kwargs)
-        return self._paginate_and_yield_reports(resp)

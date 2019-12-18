@@ -87,12 +87,12 @@ for page in df.get_employee_raw_punches():
 
 ### Yielding Resource Records
 
-Optionally, you can use `yield_` methods to handle response pagination and yieliding resource records. The methods will paginate responses and iterate through response content to yield a single resource record for the given resource and the corresponding `DayforceResponse` instance used to obtain the record:
+Optionally, you can use the `DayforceResponse` `.yield_records()` method to handle response pagination and yieliding resource records. The method will paginate the response and iterate through response content to yield single resource records for the given resource and the corresponding `DayforceResponse` instance:
 
 ```python
-for employee, resp in df.yield_employees():
+for page, employee in df.get_employees().yield_records():
     print(employee)
-    print(resp)
+    print(page)
 ```
 
 Output:

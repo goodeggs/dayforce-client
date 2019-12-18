@@ -1,4 +1,4 @@
-from typing import Dict, Optional
+from typing import Dict, Iterator, Optional, Tuple
 
 import attr
 import requests
@@ -38,3 +38,13 @@ class DayforceResponse(object):
     @staticmethod
     def _is_paginated(resp) -> bool:
         return resp.json().get("Paging") is not None
+
+    def yield_records(self):
+        for page in self:
+            for record in self.get("Data"):
+                yield page, record
+
+    def yield_report_rows(self):
+        for page in self:
+            for row in self.get("Data").get("Rows"):
+                yield page, row
