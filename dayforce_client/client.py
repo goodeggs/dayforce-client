@@ -1,6 +1,7 @@
 from typing import Dict, Iterator, Optional, Set, Tuple
 
 import attr
+import pysftp
 import requests
 
 from dayforce_client.response import DayforceResponse
@@ -89,3 +90,27 @@ class Dayforce(object):
 
     def get_report(self, xrefcode: str, **kwargs):
         return self._get_resource(resource=f"Reports/{xrefcode}", **kwargs)
+
+
+@attr.s
+class DayforceSFTP(object):
+
+    hostname: str = attr.ib()
+    username: str = attr.ib()
+    password: str = attr.ib(repr=False)
+    port: int = attr.ib(default=22)
+    known_hosts: str = attr.ib(default='~/.ssh/known_hosts')
+    disable_host_key_checking: bool = attr.ib(default=False)
+
+    def __attrs_post_init__(self):
+        if self.disable_host_key_checking is True:
+            self.cnopts = pysftp.CnOpts()
+            self.cnopts.hostkeys = None
+        else:
+            self.cnopts = pysftp.CnOpts(knownhosts=self.known_hosts)
+            self.cnopts.hostkeys = None
+
+
+    def listdir(self):
+        with pysftp.Connection(host=self.hostname, username=self.username, password=self.password, port=self.port, cnopts=self.cnopts) as sftp:
+            return sftp.pwd

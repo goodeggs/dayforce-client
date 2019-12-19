@@ -1,1 +1,1 @@
-from dayforce_client.client import Dayforce
+from dayforce_client.client import Dayforce, DayforceSFTP

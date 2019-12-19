@@ -37,7 +37,8 @@ setuptools.setup(
     packages=setuptools.find_packages(exclude=['tests']),
     install_requires=[
         'requests==2.22.0',
-        'attrs==19.3.0'
+        'attrs==19.3.0',
+        'pysftp==0.2.9'
     ],
     python_requires='>=3.6'
 )
