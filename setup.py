@@ -22,7 +22,7 @@ setuptools.setup(
     long_description=readme,
     long_description_content_type='text/markdown',
     classifiers=[
-        'License :: OSI Approved :: MIT',
+        'License :: OSI Approved :: MIT License',
         'Natural Language :: English',
         'Topic :: Software Development',
         'Intended Audience :: Developers',
