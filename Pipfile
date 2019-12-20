@@ -9,6 +9,7 @@ name = "pypi"
 dayforce-client = {path = ".", editable = true}
 isort = "*"
 flake8 = "*"
+pytz = "*"
 responses = "*"
 mypy = "*"
 pytest = "*"

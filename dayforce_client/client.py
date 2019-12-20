@@ -1,4 +1,4 @@
-from typing import Dict, Iterator, Optional, Set, Tuple
+from typing import Dict, Optional, Set
 
 import attr
 import pysftp
@@ -109,7 +109,6 @@ class DayforceSFTP(object):
         else:
             self.cnopts = pysftp.CnOpts(knownhosts=self.known_hosts)
             self.cnopts.hostkeys = None
-
 
     def listdir(self):
         with pysftp.Connection(host=self.hostname, username=self.username, password=self.password, port=self.port, cnopts=self.cnopts) as sftp:

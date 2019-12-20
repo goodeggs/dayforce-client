@@ -39,12 +39,12 @@ class DayforceResponse(object):
     def _is_paginated(resp) -> bool:
         return resp.json().get("Paging") is not None
 
-    def yield_records(self):
+    def yield_records(self) -> Iterator[Tuple]:
         for page in self:
             for record in self.get("Data"):
                 yield page, record
 
-    def yield_report_rows(self):
+    def yield_report_rows(self) -> Iterator[Tuple]:
         for page in self:
             for row in self.get("Data").get("Rows"):
                 yield page, row
