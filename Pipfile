@@ -1,0 +1,20 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+
+[dev-packages]
+dayforce-client = {path = ".", editable = true}
+isort = "*"
+flake8 = "*"
+pytz = "*"
+responses = "*"
+mypy = "*"
+pytest = "*"
+tox = "*"
+
+[requires]
+
+[pipenv]
