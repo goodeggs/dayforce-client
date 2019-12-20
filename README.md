@@ -43,10 +43,10 @@ print(resp.resp.url)
 print(resp.resp.status_code)
 print(resp.resp.ok)
 print(resp.resp.elapsed)
-```
 
-Output:
-```
+...
+
+
 Dayforce(username='your-username', client_namespace='your-client-namespace', dayforce_release=57, api_version='V1', url='https://usr57-services.dayforcehcm.com/Api/your-client-namespace/V1')
 <class 'dayforce_client.client.Dayforce'>
 {}
@@ -98,10 +98,9 @@ Optionally, you can use the `DayforceResponse` `.yield_records()` method to hand
 for page, employee in df.get_employees().yield_records():
     print(employee)
     print(page)
-```
 
-Output:
-```
+...
+
 {'XRefCode': '12345'}
 DayforceResponse(client=Dayforce(username='your-username', client_namespace='your-client-namespace', dayforce_release=57, api_version='V1', url='https://usr57-services.dayforcehcm.com/Api/your-client-namespace/V1'), params={}, resp=<Response [200]>)
 {'XRefCode': '67891'}
