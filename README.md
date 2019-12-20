@@ -1,4 +1,9 @@
 # dayforce-client
+[![PyPI version](https://badge.fury.io/py/dayforce-client.svg)](https://badge.fury.io/py/dayforce-client)
+![PyPI - Status](https://img.shields.io/pypi/status/dayforce-client)
+[![Build Status](https://travis-ci.com/goodeggs/dayforce-client.svg?branch=master)](https://travis-ci.com/goodeggs/dayforce-client.svg?branch=master)
+![PyPI - Python Version](https://img.shields.io/pypi/pyversions/dayforce-client)
+![PyPI - License](https://img.shields.io/pypi/l/dayforce-client)
 
 dayforce-client is a python SDK for interfacing with the Dayforce REST API.
 
