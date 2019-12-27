@@ -116,7 +116,7 @@ client = DayforceSFTP(
   password='sekret',
   disable_host_key_checking=True,
 )
-print(client.listdir())
+client.connect()
 ```
 
 Using `disable_host_key_checking` is discouraged, however. Instead, use `ssh-keyscan` to retrieve a known-good key (better yet, see if Dayforce will provide it to you!) and pass it in to the construtor.
@@ -134,5 +134,28 @@ client = DayforceSFTP(
   password='sekret',
   host_key='AAAAB3...snip...XYZ',
 )
-print(client.listdir())
+client.connect()
+```
+
+### Batch Imports
+
+Dayforce provides the ability to batch import data via SFTP. This client wraps up most of the business logic around this process, and exposes a simple, high-level API.
+
+```python
+from dayforce import DayforceSFTP, ImportError, ImportPending
+
+client = DayforceSFTP(hostname=...)
+with client.connect():
+  batch_token = client.put_import('./local/path/to/batch-20191225T000000.csv', type='KpiTargetImport')
+  while True:
+    try:
+      client.raise_for_import_status(batch_token)
+      print('batch import succeeded')
+      break
+    except ImportPending e:
+      sleep 10
+      continue
+    except ImportError e:
+      print('batch import failed')
+      break
 ```

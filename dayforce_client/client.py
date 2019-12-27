@@ -2,6 +2,9 @@ import base64
 import platform
 import sys
 from typing import Dict, Optional
+from contextlib import contextmanager
+import os
+from typing import Dict, Optional, Set
 
 import attr
 import paramiko
@@ -24,11 +27,13 @@ class Dayforce(object):
 
     @classmethod
     def from_config(cls, config):
-        return cls(username=config.get("username"),
-                   password=config.get("password"),
-                   client_namespace=config.get("client_namespace"),
-                   dayforce_release=config.get("dayforce_release"),
-                   api_version=config.get("api_version"))
+        return cls(
+            username=config.get("username"),
+            password=config.get("password"),
+            client_namespace=config.get("client_namespace"),
+            dayforce_release=config.get("dayforce_release"),
+            api_version=config.get("api_version"),
+        )
 
     def __attrs_post_init__(self):
         self.url = f"https://usr{self.dayforce_release}-services.dayforcehcm.com/Api/{self.client_namespace}/{self.api_version}"
@@ -42,7 +47,7 @@ class Dayforce(object):
         return user_agent
 
     def _construct_headers(self) -> Dict:
-        '''Constructs a standard set of headers for HTTP requests.'''
+        """Constructs a standard set of headers for HTTP requests."""
         headers = requests.utils.default_headers()
         headers["User-Agent"] = self._construct_user_agent()
         headers["Content-Type"] = "application/json"
@@ -105,6 +110,9 @@ class DayforceSFTP(object):
     disable_host_key_checking: bool = attr.ib(default=False)
     cnopts: pysftp.CnOpts = attr.ib(init=False)
 
+    _sftp: Optional[pysftp.Connection] = attr.ib(default=None)
+    _sftp_live: bool = attr.ib(default=False)
+
     def __attrs_post_init__(self):
         self.cnopts = pysftp.CnOpts()
         if self.disable_host_key_checking is True:
@@ -112,10 +120,73 @@ class DayforceSFTP(object):
         elif self.host_key is not None:
             key_b = self.host_key.encode()
             key = paramiko.RSAKey(data=base64.decodebytes(key_b))
-            self.cnopts.hostkeys.add(self.hostname, 'ssh-rsa', key)
+            self.cnopts.hostkeys.add(self.hostname, "ssh-rsa", key)
         else:
-            raise RuntimeError('disable_host_key_checking or host_key must be set')
+            raise RuntimeError("disable_host_key_checking or host_key must be set")
 
-    def listdir(self):
-        with pysftp.Connection(host=self.hostname, username=self.username, password=self.password, port=self.port, cnopts=self.cnopts) as sftp:
-            return sftp.pwd
+    def _connect(self):
+        """Establish the SFTP connection."""
+        if not self._sftp_live:
+            self._sftp = pysftp.Connection(
+                host=self.hostname,
+                username=self.username,
+                password=self.password,
+                port=self.port,
+                cnopts=self.cnopts,
+            )
+            self._sftp_live = True
+
+    def _disconnect(self):
+        """Close the SFTP connection."""
+        if self._sftp_live:
+            self._sftp.close()
+            self._sftp_live = False
+
+    @contextmanager
+    def connect(self):
+        self._connect()
+        try:
+            yield self
+        except Exception as e:
+            self._disconnect()
+            raise e
+
+    """Upload a batch import file and return a token for status checking"""
+
+    def put_import(self, filename: str, type: str) -> str:
+        self._connect()
+        remotepath = f"/Import/{type}/{filename}"
+        if os.path.getsize(filename) > 100 * 1e6:
+            raise RuntimeError(f"{filename} exceeds the 100MB batch size limit")
+        self._sftp.put(filename, remotepath=remotepath)
+        self._sftp.rename(remotepath, f"{remotepath}.ready")
+        return remotepath
+
+    def raise_for_import_status(self, token: str):
+        self._connect()
+        filename = os.path.basename(token)
+        dirname = os.path.dirname(token)
+        if self._sftp.exists(f"{dirname}/archive/{filename}.done"):
+            return
+        elif self._sftp.exists(f"{dirname}/error/{filename}.error"):
+            raise ImportError()
+        else:
+            raise ImportPending()
+
+
+class Error(Exception):
+    """Base class for exceptions in this module."""
+
+    pass
+
+
+class ImportError(Error):
+    """Raised when an import resulted in an error"""
+
+    pass
+
+
+class ImportPending(Error):
+    """Raised when the result of an import cannot be determined"""
+
+    pass

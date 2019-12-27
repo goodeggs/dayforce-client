@@ -4,9 +4,11 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+paramiko = "*"
+pysftp = "*"
 
 [dev-packages]
-dayforce-client = {path = ".", editable = true}
+dayforce-client = {path = ".",editable = true}
 isort = "*"
 flake8 = "*"
 pytz = "*"
