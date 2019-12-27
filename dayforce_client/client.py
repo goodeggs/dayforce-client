@@ -1,6 +1,8 @@
+import base64
 from typing import Dict, Optional, Set
 
 import attr
+import paramiko
 import pysftp
 import requests
 
@@ -99,16 +101,20 @@ class DayforceSFTP(object):
     username: str = attr.ib()
     password: str = attr.ib(repr=False)
     port: int = attr.ib(default=22)
-    known_hosts: str = attr.ib(default='~/.ssh/known_hosts')
+    # the host key can be retrieved with ssh-keyscan (pass just the base64 encoded part of the line beginning with ssh-rsa)
+    host_key: str = attr.ib(default=None)
     disable_host_key_checking: bool = attr.ib(default=False)
 
     def __attrs_post_init__(self):
+        self.cnopts = pysftp.CnOpts()
         if self.disable_host_key_checking is True:
-            self.cnopts = pysftp.CnOpts()
             self.cnopts.hostkeys = None
+        elif self.host_key is not None:
+            key_b = self.host_key.encode()
+            key = paramiko.RSAKey(data=base64.decodebytes(key_b))
+            self.cnopts.hostkeys.add(self.hostname, 'ssh-rsa', key)
         else:
-            self.cnopts = pysftp.CnOpts(knownhosts=self.known_hosts)
-            self.cnopts.hostkeys = None
+            raise RuntimeError('disable_host_key_checking or host_key must be set')
 
     def listdir(self):
         with pysftp.Connection(host=self.hostname, username=self.username, password=self.password, port=self.port, cnopts=self.cnopts) as sftp:
