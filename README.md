@@ -5,7 +5,7 @@
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/dayforce-client)
 ![PyPI - License](https://img.shields.io/pypi/l/dayforce-client)
 
-dayforce-client is a python SDK for interfacing with the Dayforce REST API.
+dayforce-client is a python SDK for interfacing with the Dayforce REST API and SFTP server.
 
 ## Installation
 
@@ -13,7 +13,7 @@ dayforce-client is a python SDK for interfacing with the Dayforce REST API.
 $ pip3 install dayforce-client
 ```
 
-## Basic Usage
+## Basic Usage (Rest API)
 
 The main interface to the Dayforce REST API is the `Dayforce` class. You can instantiate the `Dayforce` class by supplying a few authentication and configuration arguments:
 
@@ -105,4 +105,34 @@ for page, employee in df.get_employees().yield_records():
 DayforceResponse(client=Dayforce(username='your-username', client_namespace='your-client-namespace', dayforce_release=57, api_version='V1', url='https://usr57-services.dayforcehcm.com/Api/your-client-namespace/V1'), params={}, resp=<Response [200]>)
 {'XRefCode': '67891'}
 DayforceResponse(client=Dayforce(username='your-username', client_namespace='your-client-namespace', dayforce_release=57, api_version='V1', url='https://usr57-services.dayforcehcm.com/Api/your-client-namespace/V1'), params={}, resp=<Response [200]>)
+```
+
+## Basic Usage (SFTP client)
+
+```python
+client = DayforceSFTP(
+  hostname='foo01.dayforcehcm.com',
+  username='mycompany',
+  password='sekret',
+  disable_host_key_checking=True,
+)
+print(client.listdir())
+```
+
+Using `disable_host_key_checking` is discouraged, however. Instead, use `ssh-keyscan` to retrieve a known-good key (better yet, see if Dayforce will provide it to you!) and pass it in to the construtor.
+
+```shell
+ssh-keyscan foo01.dayforcehcm.com
+# foo01.dayforcehcm.com:22 SSH-2.0-9.99 FlowSsh: Bitvise SSH Server (WinSSHD)
+foo01.dayforcehcm.com ssh-rsa AAAAB3...snip...XYZ
+```
+
+```python
+client = DayforceSFTP(
+  hostname='foo01.dayforcehcm.com',
+  username='mycompany',
+  password='sekret',
+  host_key='AAAAB3...snip...XYZ',
+)
+print(client.listdir())
 ```
