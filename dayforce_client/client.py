@@ -102,7 +102,7 @@ class DayforceSFTP(object):
     password: str = attr.ib(repr=False)
     port: int = attr.ib(default=22)
     # the host key can be retrieved with ssh-keyscan (pass just the base64 encoded part of the line beginning with ssh-rsa)
-    host_key: str = attr.ib(repr=False, default=None)
+    host_key: str = attr.ib(default=None)
     disable_host_key_checking: bool = attr.ib(default=False)
     cnopts: pysftp.CnOpts = attr.ib(init=False)
 
