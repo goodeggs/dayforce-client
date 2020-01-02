@@ -76,10 +76,6 @@ class Dayforce(object):
     def get_employees(self, **kwargs) -> DayforceResponse:
         return self._get_resource(resource='Employees', params=kwargs)
 
-    def create_employee(self, *, xrefcode: str, **kwargs) -> DayforceResponse:
-        kwargs.update({"XRefCode": xrefcode})
-        return self._create_resource(resource='Employees', data=kwargs)
-
     def get_employee_details(self, *, xrefcode: str, **kwargs) -> DayforceResponse:
         return self._get_resource(resource=f"Employees/{xrefcode}", params=kwargs)
 
