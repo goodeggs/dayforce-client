@@ -60,10 +60,10 @@ class Dayforce(object):
         resp = self._request(method="GET", url=url, params=params)
         return DayforceResponse(client=self, params=params, resp=resp)
 
-    def _create_resource(self, *, resource: str, data: Optional[Dict] = None) -> DayforceResponse:
+    def _create_resource(self, *, resource: str, params: Optional[Dict] = None, data: Optional[Dict] = None) -> DayforceResponse:
         url = f"{self.url}/{resource}"
-        resp = self._request(method="POST", url=url, data=data)
-        return DayforceResponse(client=self, data=data, resp=resp)
+        resp = self._request(method="POST", url=url, params=params, data=data)
+        return DayforceResponse(client=self, params=params, data=data, resp=resp)
 
     def get_employee_raw_punches(self, *, filterTransactionStartTimeUTC: str, filterTransactionEndTimeUTC: str, **kwargs) -> DayforceResponse:
         kwargs.update({"filterTransactionStartTimeUTC": filterTransactionStartTimeUTC, "filterTransactionEndTimeUTC": filterTransactionEndTimeUTC})
