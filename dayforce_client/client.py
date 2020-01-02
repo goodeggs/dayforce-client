@@ -36,6 +36,7 @@ class Dayforce(object):
         headers = requests.utils.default_headers()
         headers["User-Agent"] = f"python-dayforce-client/{__version__}"
         headers["Content-Type"] = "application/json"
+        headers["Accept"] = "application/json"
         return headers
 
     def _get(self, url: str, params: Optional[Dict] = None) -> requests.Response:
@@ -58,39 +59,31 @@ class Dayforce(object):
         resp = self._get(url=url, params=kwargs)
         return DayforceResponse(client=self, params=kwargs, resp=resp)
 
-    def _check_required_params(self, req_params: Set[str], params: Dict):
-        supplied_params = set(params.keys())
-        if not req_params.issubset(supplied_params):
-            raise KeyError(f"Missing required query parameters: {req_params.difference(supplied_params)}")
-
-    def get_employee_raw_punches(self, **kwargs):
-        req_params = {"filterTransactionStartTimeUTC", "filterTransactionEndTimeUTC"}
-        self._check_required_params(req_params, params=kwargs)
+    def get_employee_raw_punches(self, *, filterTransactionStartTimeUTC: str, filterTransactionEndTimeUTC: str, **kwargs) -> DayforceResponse:
+        kwargs.update({"filterTransactionStartTimeUTC": filterTransactionStartTimeUTC, "filterTransactionEndTimeUTC": filterTransactionEndTimeUTC})
         return self._get_resource(resource='EmployeeRawPunches', **kwargs)
 
-    def get_employee_punches(self, **kwargs):
-        req_params = {"filterTransactionStartTimeUTC", "filterTransactionEndTimeUTC"}
-        self._check_required_params(req_params, params=kwargs)
+    def get_employee_punches(self, *, filterTransactionStartTimeUTC: str, filterTransactionEndTimeUTC: str, **kwargs) -> DayforceResponse:
+        kwargs.update({"filterTransactionStartTimeUTC": filterTransactionStartTimeUTC, "filterTransactionEndTimeUTC": filterTransactionEndTimeUTC})
         return self._get_resource(resource='EmployeePunches', **kwargs)
 
-    def get_employees(self, **kwargs):
+    def get_employees(self, **kwargs) -> DayforceResponse:
         return self._get_resource(resource='Employees', **kwargs)
 
-    def get_employee_details(self, xrefcode: str, **kwargs):
+    def get_employee_details(self, *, xrefcode: str, **kwargs) -> DayforceResponse:
         return self._get_resource(resource=f"Employees/{xrefcode}", **kwargs)
 
-    def get_employee_schedules(self, xrefcode: str, **kwargs):
-        req_params = {"filterScheduleStartDate", "filterScheduleEndDate"}
-        self._check_required_params(req_params, params=kwargs)
+    def get_employee_schedules(self, *, xrefcode: str, filterScheduleStartDate: str, filterScheduleEndDate: str, **kwargs) -> DayforceResponse:
+        kwargs.update({"filterScheduleStartDate": filterScheduleStartDate, "filterScheduleEndDate": filterScheduleEndDate})
         return self._get_resource(resource=f"Employees/{xrefcode}/Schedules", **kwargs)
 
-    def get_reports(self):
+    def get_reports(self) -> DayforceResponse:
         return self._get_resource(resource='ReportMetadata')
 
-    def get_report_metadata(self, xrefcode: str):
+    def get_report_metadata(self, *, xrefcode: str) -> DayforceResponse:
         return self._get_resource(resource=f"ReportMetadata/{xrefcode}")
 
-    def get_report(self, xrefcode: str, **kwargs):
+    def get_report(self, *, xrefcode: str, **kwargs) -> DayforceResponse:
         return self._get_resource(resource=f"Reports/{xrefcode}", **kwargs)
 
 
