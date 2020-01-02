@@ -8,8 +8,9 @@ import requests
 class DayforceResponse(object):
 
     client = attr.ib()
-    params: Optional[Dict] = attr.ib()
     resp: requests.Response = attr.ib()
+    params: Optional[Dict] = attr.ib(default=None)
+    data: Optional[Dict] = attr.ib(default=None)
 
     def __iter__(self):
         self._iteration = 0
@@ -22,7 +23,7 @@ class DayforceResponse(object):
         if self._is_paginated(self.resp) is True:
             next_page = self.resp.json().get("Paging").get("Next")
             if next_page != "" and next_page is not None:
-                self.resp = self.client._get(url=next_page, params=self.params)
+                self.resp = self.client._request(method="GET", url=next_page, params=self.params)
                 return self
             else:
                 raise StopIteration
