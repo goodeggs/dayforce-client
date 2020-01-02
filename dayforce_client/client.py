@@ -1,7 +1,7 @@
 import base64
 import platform
 import sys
-from typing import Dict, Optional, Set
+from typing import Dict, Optional
 
 import attr
 import paramiko

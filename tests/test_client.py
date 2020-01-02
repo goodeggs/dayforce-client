@@ -6,7 +6,6 @@ import responses
 
 from dayforce_client.client import Dayforce
 from dayforce_client.response import DayforceResponse
-from dayforce_client.version import __version__
 
 
 def test_url(client):
@@ -14,22 +13,15 @@ def test_url(client):
     assert client.url == expected
 
 
-def test_headers(client):
-    expected = requests.utils.default_headers()
-    expected["User-Agent"] = f"python-dayforce-client/{__version__}"
-    expected["Content-Type"] = "application/json"
-    assert client._construct_headers() == expected
-
-
-def test_get(client):
-    get_url = f"{client.url}/ClientMetadata"
+def test_get_request(client):
+    url = f"{client.url}/ClientMetadata"
     with responses.RequestsMock() as rsps:
         expected = {
             "ServiceVersion": "57.3.2.35215",
             "ServiceUri": "https://usr57-services.dayforcehcm.com/api"
         }
-        rsps.add(responses.GET, get_url, json=expected, status=200)
-        resp = client._get(url=get_url)
+        rsps.add(responses.GET, url, json=expected, status=200)
+        resp = client._request(method="GET", url=url)
         assert type(resp) == requests.Response
         assert resp.json() == expected
         assert resp.status_code == 200
@@ -56,21 +48,12 @@ def test_get_resource_params(client, params):
     with responses.RequestsMock() as rsps:
         expected = {"Data": [{"XRefCode": "12345"}, {"XRefCode": "34567"}]}
         rsps.add(responses.GET, url, json=expected, status=200)
-        resp = client._get_resource(resource='Employees', **params)
+        resp = client._get_resource(resource='Employees', params=params)
         assert type(resp) == DayforceResponse
         assert type(resp.client) == Dayforce
         assert type(resp.resp) == requests.Response
         assert resp.resp.json() == expected
         assert resp.params == params
-
-
-@pytest.mark.parametrize(
-    'req_params, params',
-    [({"filterStartDateUTC", "filterEndDateUTC"}, {"filterEndDateUTC": "2019-02-01T00:00:00Z"})]
-)
-@pytest.mark.xfail(raises=KeyError)
-def test_check_required_params(client, req_params, params):
-    assert client._check_required_params(req_params, params)
 
 
 @pytest.mark.parametrize(
