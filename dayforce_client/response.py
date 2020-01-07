@@ -61,16 +61,15 @@ class DayforceResponse(object):
                                      supplied value should be (100, 60). If a response is
                                      paginated, a single HTTP request will be made per page.
         """
-        if limit is not None:
-            times: collections.deque = collections.deque()
+        times: collections.deque = collections.deque()
 
         for page in self:
+            times.appendleft(time.time())
             for record in self.get("Data"):
                 yield page, record
 
             if limit is not None:
                 self._rate_limit(times, limit)
-                times.appendleft(time.time())
 
     def yield_report_rows(self, limit: Optional[Tuple[int, int]] = None) -> Iterator[Tuple]:
         """Paginates the response and yields relevant rows for Report objects.
@@ -82,13 +81,12 @@ class DayforceResponse(object):
                                      supplied value should be (100, 60). If a response is
                                      paginated, a single HTTP request will be made per page.
         """
-        if limit is not None:
-            times: collections.deque = collections.deque()
+        times: collections.deque = collections.deque()
 
         for page in self:
+            times.appendleft(time.time())
             for row in self.get("Data").get("Rows"):
                 yield page, row
 
             if limit is not None:
                 self._rate_limit(times, limit)
-                times.appendleft(time.time())
