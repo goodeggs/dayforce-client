@@ -82,14 +82,13 @@ class DayforceResponse(object):
                                      supplied value should be (100, 60). If a response is
                                      paginated, a single HTTP request will be made per page.
         """
-        rate_limiting = limit is not None
-        if rate_limiting:
-            times = collections.deque()
+        if limit is not None:
+            times: collections.deque = collections.deque()
 
         for page in self:
             for row in self.get("Data").get("Rows"):
                 yield page, row
 
-            if rate_limiting:
+            if limit is not None:
                 self._rate_limit(times, limit)
                 times.appendleft(time.time())
