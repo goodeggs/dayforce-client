@@ -23,6 +23,7 @@ setuptools.setup(
     long_description_content_type='text/markdown',
     classifiers=[
         'License :: OSI Approved :: MIT License',
+        'Development Status :: 5 - Production/Stable',
         'Natural Language :: English',
         'Topic :: Software Development',
         'Intended Audience :: Developers',
