@@ -1,3 +1,5 @@
+import collections
+import time
 from typing import Dict, Iterator, Optional, Tuple
 
 import attr
@@ -40,12 +42,53 @@ class DayforceResponse(object):
     def _is_paginated(resp) -> bool:
         return resp.json().get("Paging") is not None
 
-    def yield_records(self) -> Iterator[Tuple]:
+    @staticmethod
+    def _rate_limit(times: collections.deque, limit: Tuple[int, int]):
+        if len(times) >= limit[0]:
+            start = times.pop()
+            now = time.time()
+            sleep_time = limit[1] - (now - start)
+            if sleep_time > 0:
+                time.sleep(sleep_time)
+
+    def yield_records(self, limit: Optional[Tuple[int, int]] = None) -> Iterator[Tuple]:
+        """Paginates the response and yields relevant records.
+
+        Args:
+            limit (Tuple[int, int]): A tuple dictating the number of requests to be made
+                                     in a given number of seconds. For example, if it is
+                                     only possible to make 100 requests per minute, the
+                                     supplied value should be (100, 60).
+        """
+        rate_limiting = limit is not None
+        if rate_limiting:
+            times = collections.deque()
+
         for page in self:
             for record in self.get("Data"):
                 yield page, record
 
-    def yield_report_rows(self) -> Iterator[Tuple]:
+            if rate_limiting:
+                self._rate_limit(times, limit)
+                times.appendleft(time.time())
+
+    def yield_report_rows(self, limit: Optional[Tuple[int, int]] = None) -> Iterator[Tuple]:
+        """Paginates the response and yields relevant records for Report objects.
+
+        Args:
+            limit (Tuple[int, int]): A tuple dictating the number of requests to be made
+                                     in a given number of seconds. For example, if it is
+                                     only possible to make 100 requests per minute, the
+                                     supplied value should be (100, 60).
+        """
+        rate_limiting = limit is not None
+        if rate_limiting:
+            times = collections.deque()
+
         for page in self:
             for row in self.get("Data").get("Rows"):
                 yield page, row
+
+            if rate_limiting:
+                self._rate_limit(times, limit)
+                times.appendleft(time.time())
