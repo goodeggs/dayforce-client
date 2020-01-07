@@ -43,7 +43,7 @@ class DayforceResponse(object):
         return resp.json().get("Paging") is not None
 
     @staticmethod
-    def _rate_limit(times, limit):
+    def _rate_limit(times: collections.deque, limit: Tuple[int, int]):
         if len(times) >= limit[0]:
             start = times.pop()
             now = time.time()
@@ -61,15 +61,14 @@ class DayforceResponse(object):
                                      supplied value should be (100, 60). If a response is
                                      paginated, a single HTTP request will be made per page.
         """
-        rate_limiting = limit is not None
-        if rate_limiting:
-            times = collections.deque()
+        if limit is not None:
+            times: collections.deque = collections.deque()
 
         for page in self:
             for record in self.get("Data"):
                 yield page, record
 
-            if rate_limiting:
+            if limit is not None:
                 self._rate_limit(times, limit)
                 times.appendleft(time.time())
 
