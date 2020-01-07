@@ -58,7 +58,8 @@ class DayforceResponse(object):
             limit (Tuple[int, int]): A tuple dictating the number of requests to be made
                                      in a given number of seconds. For example, if it is
                                      only possible to make 100 requests per minute, the
-                                     supplied value should be (100, 60).
+                                     supplied value should be (100, 60). If a response is
+                                     paginated, a single HTTP request will be made per page.
         """
         rate_limiting = limit is not None
         if rate_limiting:
@@ -73,13 +74,14 @@ class DayforceResponse(object):
                 times.appendleft(time.time())
 
     def yield_report_rows(self, limit: Optional[Tuple[int, int]] = None) -> Iterator[Tuple]:
-        """Paginates the response and yields relevant records for Report objects.
+        """Paginates the response and yields relevant rows for Report objects.
 
         Args:
             limit (Tuple[int, int]): A tuple dictating the number of requests to be made
                                      in a given number of seconds. For example, if it is
                                      only possible to make 100 requests per minute, the
-                                     supplied value should be (100, 60).
+                                     supplied value should be (100, 60). If a response is
+                                     paginated, a single HTTP request will be made per page.
         """
         rate_limiting = limit is not None
         if rate_limiting:
