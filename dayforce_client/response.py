@@ -43,7 +43,7 @@ class DayforceResponse(object):
         return resp.json().get("Paging") is not None
 
     @staticmethod
-    def _rate_limit(times: collections.deque, limit: Tuple[int, int]):
+    def _rate_limit(times, limit):
         if len(times) >= limit[0]:
             start = times.pop()
             now = time.time()
