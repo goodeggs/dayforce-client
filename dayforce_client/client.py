@@ -150,9 +150,9 @@ class DayforceSFTP(object):
             self._disconnect()
             raise e
 
-    """Upload a batch import file and return a token for status checking"""
 
     def put_import(self, filename: str, type: str) -> str:
+        """Upload a batch import file and return a token for status checking"""
         self._connect()
         remotepath = f"/Import/{type}/{filename}"
         if os.path.getsize(filename) > 100 * 1e6:
