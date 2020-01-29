@@ -159,3 +159,12 @@ with client.connect():
       print('batch import failed')
       break
 ```
+
+## Development
+
+```shell
+python3 -m venv install .venv
+source .venv/bin/activate
+make dev_install
+make test
+```

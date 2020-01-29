@@ -1,8 +1,13 @@
-isort:
-	isort --recursive
+ISORT=isort --recursive --skip .venv --skip .venvs --skip .tox
 
-flake8:
-	flake8 . --ignore=E501,E722 --count --statistics
+fmt:
+	$(ISORT)
+
+test:
+	$(ISORT) --check-only
+	flake8 .
+	mypy .
+	pytest
 
 dev_install:
 	pip3 install --upgrade pip

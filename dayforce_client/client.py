@@ -6,10 +6,10 @@ from contextlib import contextmanager
 from typing import Dict, Optional
 
 import attr
-import requests
-
 import paramiko
 import pysftp
+import requests
+
 from dayforce_client.response import DayforceResponse
 from dayforce_client.version import __version__
 
@@ -150,9 +150,9 @@ class DayforceSFTP(object):
         try:
             yield self
         except Exception as e:
-            if should_disconnect: self._disconnect()
+            if should_disconnect:
+                self._disconnect()
             raise e
-
 
     def put_import(self, filename: str, type: str) -> str:
         """Upload a batch import file and return a token for status checking."""
@@ -162,7 +162,6 @@ class DayforceSFTP(object):
                 raise RuntimeError(f"{filename} exceeds the 100MB batch size limit")
             self._sftp.put(filename, remotepath=remotepath)
             self._sftp.rename(remotepath, f"{remotepath}.ready")
-            if should_disconnect: self._disconnect()
             return remotepath
 
     def raise_for_import_status(self, token: str):
