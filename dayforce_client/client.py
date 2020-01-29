@@ -1,16 +1,15 @@
 import base64
+import os
 import platform
 import sys
-from typing import Dict, Optional
 from contextlib import contextmanager
-import os
-from typing import Dict, Optional, Set
+from typing import Dict, Optional
 
 import attr
-import paramiko
-import pysftp
 import requests
 
+import paramiko
+import pysftp
 from dayforce_client.response import DayforceResponse
 from dayforce_client.version import __version__
 
@@ -174,19 +173,19 @@ class DayforceSFTP(object):
             raise ImportPending()
 
 
-class Error(Exception):
+class DayforceError(Exception):
     """Base class for exceptions in this module."""
 
     pass
 
 
-class ImportError(Error):
+class ImportError(DayforceError):
     """Raised when an import resulted in an error"""
 
     pass
 
 
-class ImportPending(Error):
+class ImportPending(DayforceError):
     """Raised when the result of an import cannot be determined"""
 
     pass
