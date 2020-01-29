@@ -134,6 +134,9 @@ class DayforceSFTP(object):
                 cnopts=self.cnopts,
             )
             self._sftp_live = True
+            return True
+        else:
+            return False
 
     def _disconnect(self):
         """Close the SFTP connection."""
@@ -143,34 +146,36 @@ class DayforceSFTP(object):
 
     @contextmanager
     def connect(self):
-        self._connect()
+        should_disconnect = self._connect()
         try:
             yield self
         except Exception as e:
-            self._disconnect()
+            if should_disconnect: self._disconnect()
             raise e
 
 
     def put_import(self, filename: str, type: str) -> str:
-        """Upload a batch import file and return a token for status checking"""
-        self._connect()
-        remotepath = f"/Import/{type}/{filename}"
-        if os.path.getsize(filename) > 100 * 1e6:
-            raise RuntimeError(f"{filename} exceeds the 100MB batch size limit")
-        self._sftp.put(filename, remotepath=remotepath)
-        self._sftp.rename(remotepath, f"{remotepath}.ready")
-        return remotepath
+        """Upload a batch import file and return a token for status checking."""
+        with self.connect():
+            remotepath = f"/Import/{type}/{filename}"
+            if os.path.getsize(filename) > 100 * 1e6:
+                raise RuntimeError(f"{filename} exceeds the 100MB batch size limit")
+            self._sftp.put(filename, remotepath=remotepath)
+            self._sftp.rename(remotepath, f"{remotepath}.ready")
+            if should_disconnect: self._disconnect()
+            return remotepath
 
     def raise_for_import_status(self, token: str):
-        self._connect()
-        filename = os.path.basename(token)
-        dirname = os.path.dirname(token)
-        if self._sftp.exists(f"{dirname}/archive/{filename}.done"):
-            return
-        elif self._sftp.exists(f"{dirname}/error/{filename}.error"):
-            raise ImportError()
-        else:
-            raise ImportPending()
+        """Check the status of an import."""
+        with self.connect():
+            filename = os.path.basename(token)
+            dirname = os.path.dirname(token)
+            if self._sftp.exists(f"{dirname}/archive/{filename}.done"):
+                return
+            elif self._sftp.exists(f"{dirname}/error/{filename}.error"):
+                raise ImportError()
+            else:
+                raise ImportPending()
 
 
 class DayforceError(Exception):
@@ -180,12 +185,12 @@ class DayforceError(Exception):
 
 
 class ImportError(DayforceError):
-    """Raised when an import resulted in an error"""
+    """Raised when an import resulted in an error."""
 
     pass
 
 
 class ImportPending(DayforceError):
-    """Raised when the result of an import cannot be determined"""
+    """Raised when the result of an import cannot be determined."""
 
     pass
