@@ -4,10 +4,7 @@ fmt:
 	$(ISORT)
 
 test:
-	$(ISORT) --check-only
-	flake8 .
-	mypy .
-	pytest
+	@tox -e py37
 
 dev_install:
 	pip3 install --upgrade pip
