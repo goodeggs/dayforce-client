@@ -1,10 +1,14 @@
 ISORT=isort --recursive --skip .venv --skip .venvs --skip .tox
 
 fmt:
-	$(ISORT)
+	@black .
+	@$(ISORT)
 
 test:
 	@tox -e py37
+
+clean:
+	@rm -rf .tox .mypy_cache dist
 
 dev_install:
 	pip3 install --upgrade pip

@@ -25,7 +25,9 @@ class DayforceResponse(object):
         if self._is_paginated(self.resp) is True:
             next_page = self.resp.json().get("Paging").get("Next")
             if next_page != "" and next_page is not None:
-                self.resp = self.client._request(method="GET", url=next_page, params=self.params)
+                self.resp = self.client._request(
+                    method="GET", url=next_page, params=self.params
+                )
                 return self
             else:
                 raise StopIteration
@@ -71,7 +73,9 @@ class DayforceResponse(object):
             if limit is not None:
                 self._rate_limit(times, limit)
 
-    def yield_report_rows(self, limit: Optional[Tuple[int, int]] = None) -> Iterator[Tuple]:
+    def yield_report_rows(
+        self, limit: Optional[Tuple[int, int]] = None
+    ) -> Iterator[Tuple]:
         """Paginates the response and yields relevant rows for Report objects.
 
         Args:
