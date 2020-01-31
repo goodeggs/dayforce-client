@@ -53,42 +53,101 @@ class Dayforce(object):
         headers["Accept"] = "application/json"
         return headers
 
-    def _request(self, *, method: str, url: str, params: Optional[Dict] = None, data: Optional[Dict] = None) -> requests.Response:
+    def _request(
+        self,
+        *,
+        method: str,
+        url: str,
+        params: Optional[Dict] = None,
+        data: Optional[Dict] = None,
+    ) -> requests.Response:
         headers = self._construct_headers()
-        response = requests.request(method=method, url=url, auth=(self.username, self.password), headers=headers, params=params, data=data, timeout=30)
+        response = requests.request(
+            method=method,
+            url=url,
+            auth=(self.username, self.password),
+            headers=headers,
+            params=params,
+            data=data,
+            timeout=30,
+        )
         response.raise_for_status()
         return response
 
-    def _get_resource(self, *, resource: str, params: Optional[Dict] = None) -> DayforceResponse:
+    def _get_resource(
+        self, *, resource: str, params: Optional[Dict] = None
+    ) -> DayforceResponse:
         url = f"{self.url}/{resource}"
         resp = self._request(method="GET", url=url, params=params)
         return DayforceResponse(client=self, params=params, resp=resp)
 
-    def _create_resource(self, *, resource: str, params: Optional[Dict] = None, data: Optional[Dict] = None) -> DayforceResponse:
+    def _create_resource(
+        self,
+        *,
+        resource: str,
+        params: Optional[Dict] = None,
+        data: Optional[Dict] = None,
+    ) -> DayforceResponse:
         url = f"{self.url}/{resource}"
         resp = self._request(method="POST", url=url, params=params, data=data)
         return DayforceResponse(client=self, params=params, data=data, resp=resp)
 
-    def get_employee_raw_punches(self, *, filterTransactionStartTimeUTC: str, filterTransactionEndTimeUTC: str, **kwargs) -> DayforceResponse:
-        kwargs.update({"filterTransactionStartTimeUTC": filterTransactionStartTimeUTC, "filterTransactionEndTimeUTC": filterTransactionEndTimeUTC})
-        return self._get_resource(resource='EmployeeRawPunches', params=kwargs)
+    def get_employee_raw_punches(
+        self,
+        *,
+        filterTransactionStartTimeUTC: str,
+        filterTransactionEndTimeUTC: str,
+        **kwargs,
+    ) -> DayforceResponse:
+        kwargs.update(
+            {
+                "filterTransactionStartTimeUTC": filterTransactionStartTimeUTC,
+                "filterTransactionEndTimeUTC": filterTransactionEndTimeUTC,
+            }
+        )
+        return self._get_resource(resource="EmployeeRawPunches", params=kwargs)
 
-    def get_employee_punches(self, *, filterTransactionStartTimeUTC: str, filterTransactionEndTimeUTC: str, **kwargs) -> DayforceResponse:
-        kwargs.update({"filterTransactionStartTimeUTC": filterTransactionStartTimeUTC, "filterTransactionEndTimeUTC": filterTransactionEndTimeUTC})
-        return self._get_resource(resource='EmployeePunches', params=kwargs)
+    def get_employee_punches(
+        self,
+        *,
+        filterTransactionStartTimeUTC: str,
+        filterTransactionEndTimeUTC: str,
+        **kwargs,
+    ) -> DayforceResponse:
+        kwargs.update(
+            {
+                "filterTransactionStartTimeUTC": filterTransactionStartTimeUTC,
+                "filterTransactionEndTimeUTC": filterTransactionEndTimeUTC,
+            }
+        )
+        return self._get_resource(resource="EmployeePunches", params=kwargs)
 
     def get_employees(self, **kwargs) -> DayforceResponse:
-        return self._get_resource(resource='Employees', params=kwargs)
+        return self._get_resource(resource="Employees", params=kwargs)
 
     def get_employee_details(self, *, xrefcode: str, **kwargs) -> DayforceResponse:
         return self._get_resource(resource=f"Employees/{xrefcode}", params=kwargs)
 
-    def get_employee_schedules(self, *, xrefcode: str, filterScheduleStartDate: str, filterScheduleEndDate: str, **kwargs) -> DayforceResponse:
-        kwargs.update({"filterScheduleStartDate": filterScheduleStartDate, "filterScheduleEndDate": filterScheduleEndDate})
-        return self._get_resource(resource=f"Employees/{xrefcode}/Schedules", params=kwargs)
+    def get_employee_schedules(
+        self,
+        *,
+        xrefcode: str,
+        filterScheduleStartDate: str,
+        filterScheduleEndDate: str,
+        **kwargs,
+    ) -> DayforceResponse:
+        kwargs.update(
+            {
+                "filterScheduleStartDate": filterScheduleStartDate,
+                "filterScheduleEndDate": filterScheduleEndDate,
+            }
+        )
+        return self._get_resource(
+            resource=f"Employees/{xrefcode}/Schedules", params=kwargs
+        )
 
     def get_reports(self) -> DayforceResponse:
-        return self._get_resource(resource='ReportMetadata')
+        return self._get_resource(resource="ReportMetadata")
 
     def get_report_metadata(self, *, xrefcode: str) -> DayforceResponse:
         return self._get_resource(resource=f"ReportMetadata/{xrefcode}")
@@ -110,7 +169,6 @@ class DayforceSFTP(object):
     cnopts: pysftp.CnOpts = attr.ib(init=False)
 
     _sftp: Optional[pysftp.Connection] = attr.ib(default=None)
-    _sftp_live: bool = attr.ib(default=False)
 
     def __attrs_post_init__(self):
         self.cnopts = pysftp.CnOpts()
@@ -125,53 +183,46 @@ class DayforceSFTP(object):
 
     def _connect(self):
         """Establish the SFTP connection."""
-        if not self._sftp_live:
-            self._sftp = pysftp.Connection(
-                host=self.hostname,
-                username=self.username,
-                password=self.password,
-                port=self.port,
-                cnopts=self.cnopts,
-            )
-            self._sftp_live = True
-            return True
-        else:
-            return False
-
-    def _disconnect(self):
-        """Close the SFTP connection."""
-        if self._sftp_live:
-            self._sftp.close()
-            self._sftp_live = False
+        conn = pysftp.Connection(
+            host=self.hostname,
+            username=self.username,
+            password=self.password,
+            port=self.port,
+            cnopts=self.cnopts,
+        )
+        return conn
 
     @contextmanager
     def connect(self):
-        should_disconnect = self._connect()
+        should_disconnect = False
+        if self._sftp is None:
+            self._sftp = self._connect()
+            should_disconnect = True
         try:
-            yield self
-        except Exception as e:
+            yield self._sftp
+        finally:
             if should_disconnect:
-                self._disconnect()
-            raise e
+                self._sftp.close()
+                self._sftp = None
 
     def put_import(self, filename: str, type: str) -> str:
         """Upload a batch import file and return a token for status checking."""
-        with self.connect():
+        with self.connect() as conn:
             remotepath = f"/Import/{type}/{filename}"
             if os.path.getsize(filename) > 100 * 1e6:
                 raise RuntimeError(f"{filename} exceeds the 100MB batch size limit")
-            self._sftp.put(filename, remotepath=remotepath)
-            self._sftp.rename(remotepath, f"{remotepath}.ready")
+            conn.put(filename, remotepath=remotepath)
+            conn.rename(remotepath, f"{remotepath}.ready")
             return remotepath
 
     def raise_for_import_status(self, token: str):
         """Check the status of an import."""
-        with self.connect():
+        with self.connect() as conn:
             filename = os.path.basename(token)
             dirname = os.path.dirname(token)
-            if self._sftp.exists(f"{dirname}/archive/{filename}.done"):
+            if conn.exists(f"{dirname}/archive/{filename}.done"):
                 return
-            elif self._sftp.exists(f"{dirname}/error/{filename}.error"):
+            elif conn.exists(f"{dirname}/error/{filename}.error"):
                 raise ImportError()
             else:
                 raise ImportPending()
