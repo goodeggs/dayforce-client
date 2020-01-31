@@ -1,8 +1,14 @@
-isort:
-	isort --recursive
+ISORT=isort --recursive --skip .venv --skip .venvs --skip .tox
 
-flake8:
-	flake8 . --ignore=E501,E722 --count --statistics
+fmt:
+	@black .
+	@$(ISORT)
+
+test:
+	@tox -e py37
+
+clean:
+	@rm -rf .tox .mypy_cache dist
 
 dev_install:
 	pip3 install --upgrade pip
