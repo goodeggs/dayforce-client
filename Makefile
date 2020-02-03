@@ -8,7 +8,7 @@ test:
 	@tox -e py37
 
 clean:
-	@rm -rf .tox .mypy_cache dist
+	@rm -rf .tox .mypy_cache .pytest_cache dist/ build/ *.egg-info
 
 dev_install:
 	pip3 install --upgrade pip
