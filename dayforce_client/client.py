@@ -22,6 +22,7 @@ class Dayforce(object):
     client_namespace: str = attr.ib()
     dayforce_release: int = attr.ib(default=57)
     api_version: str = attr.ib(default="V1")
+    test: bool = attr.ib(default=False)
     url: str = attr.ib(init=False)
 
     @classmethod
@@ -35,7 +36,10 @@ class Dayforce(object):
         )
 
     def __attrs_post_init__(self):
-        self.url = f"https://usr{self.dayforce_release}-services.dayforcehcm.com/Api/{self.client_namespace}/{self.api_version}"
+        if self.test:
+            self.url = f"https://ustestr{self.dayforce_release}-services.dayforcehcm.com/Api/{self.client_namespace}/{self.api_version}"
+        else:
+            self.url = f"https://usr{self.dayforce_release}-services.dayforcehcm.com/Api/{self.client_namespace}/{self.api_version}"
 
     @staticmethod
     def _construct_user_agent() -> str:
