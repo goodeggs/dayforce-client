@@ -1,4 +1,4 @@
-ISORT=isort --recursive --skip .venv --skip .venvs --skip .tox
+ISORT=isort . --skip .venv --skip .venvs --skip .tox --skip build
 
 fmt:
 	@black .
