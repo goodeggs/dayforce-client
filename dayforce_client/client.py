@@ -37,9 +37,9 @@ class Dayforce(object):
 
     def __attrs_post_init__(self):
         if self.test:
-            self.url = f"https://ustestr{self.dayforce_release}-services.dayforcehcm.com/Api/{self.client_namespace}/{self.api_version}"
+            self.url = f"https://ustest{self.dayforce_release}-services.dayforcehcm.com/Api/{self.client_namespace}/{self.api_version}"
         else:
-            self.url = f"https://usr{self.dayforce_release}-services.dayforcehcm.com/Api/{self.client_namespace}/{self.api_version}"
+            self.url = f"https://us{self.dayforce_release}-services.dayforcehcm.com/Api/{self.client_namespace}/{self.api_version}"
 
     @staticmethod
     def _construct_user_agent() -> str:
