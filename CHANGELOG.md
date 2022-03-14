@@ -1,6 +1,7 @@
 # 1.0.1 (Mar 2022)
 
  - Bump `paramiko` to version 2.8.1
+ - Bump `requests` to version 2.27.1
 
 # 1.0.0 (Sep 2021)
 
