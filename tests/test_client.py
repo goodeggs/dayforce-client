@@ -9,7 +9,7 @@ from dayforce_client.response import DayforceResponse
 
 
 def test_url(client):
-    expected = "https://us61-services.dayforcehcm.com/Api/foobar/V1"
+    expected = "https://us62-services.dayforcehcm.com/Api/foobar/V1"
     assert client.url == expected
 
 
@@ -17,8 +17,8 @@ def test_get_request(client):
     url = f"{client.url}/ClientMetadata"
     with responses.RequestsMock() as rsps:
         expected = {
-            "ServiceVersion": "61.3.2.35215",
-            "ServiceUri": "https://usr61-services.dayforcehcm.com/api",
+            "ServiceVersion": "62.3.2.35215",
+            "ServiceUri": "https://usr62-services.dayforcehcm.com/api",
         }
         rsps.add(responses.GET, url, json=expected, status=200)
         resp = client._request(method="GET", url=url)
