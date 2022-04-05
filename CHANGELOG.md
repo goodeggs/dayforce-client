@@ -1,3 +1,7 @@
+# 1.1.0 (Apr 2022)
+
+ - Support for `Dayforce` release 62
+
 # 1.0.1 (Mar 2022)
 
  - Bump `paramiko` to version 2.8.1

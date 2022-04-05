@@ -20,7 +20,7 @@ class Dayforce(object):
     username: str = attr.ib()
     password: str = attr.ib(repr=False)
     client_namespace: str = attr.ib()
-    dayforce_release: str = attr.ib(default="61")
+    dayforce_release: str = attr.ib(default="62")
     api_version: str = attr.ib(default="V1")
     test: bool = attr.ib(default=False)
     url: str = attr.ib(init=False)
