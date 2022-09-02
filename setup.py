@@ -40,7 +40,7 @@ setuptools.setup(
         "requests==2.27.1",
         "attrs==19.3.0",
         "pysftp==0.2.9",
-        "paramiko==2.8.1",
+        "paramiko==2.11.0",
         "cryptography<3.4",
     ],
     python_requires=">=3.6",
