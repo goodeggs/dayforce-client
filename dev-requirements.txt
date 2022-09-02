@@ -1,8 +1,8 @@
-flake8>=3.7.9
-isort>=4.3.21
-mypy>=0.761
+flake8==5.0.4
+isort==5.10.1
+mypy==0.971
 pytest==7.0.0
-responses>=0.10.9
+responses==0.21.0
 tox==3.14.2
 black==21.12b0
 click==8.0.4
