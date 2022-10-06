@@ -4,7 +4,7 @@ mypy==0.971
 pytest==7.0.0
 responses==0.21.0
 tox==3.14.2
-black==21.12b0
+black==22.10.0
 click==8.0.4
 types-paramiko==2.7.0
 types-requests==2.25.9
