@@ -1,5 +1,5 @@
 flake8==5.0.4
-isort==5.10.1
+isort==5.13.2
 mypy==0.971
 pytest==7.0.0
 responses==0.21.0
