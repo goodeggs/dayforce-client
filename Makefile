@@ -5,7 +5,7 @@ fmt:
 	@$(ISORT)
 
 test:
-	@tox -e py37
+	@tox -e py39
 
 clean:
 	@rm -rf .tox .mypy_cache .pytest_cache dist/ build/ *.egg-info
