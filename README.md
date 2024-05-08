@@ -163,7 +163,7 @@ with client.connect():
 ## Development
 
 ```shell
-python3 -m venv install .venv
+python3 -m venv .venv
 source .venv/bin/activate
 make dev_install
 make test

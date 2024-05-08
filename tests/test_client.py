@@ -9,7 +9,7 @@ from dayforce_client.response import DayforceResponse
 
 
 def test_url(client):
-    expected = "https://us62-services.dayforcehcm.com/Api/foobar/V1"
+    expected = "https://us241-services.dayforcehcm.com/Api/foobar/V1"
     assert client.url == expected
 
 
