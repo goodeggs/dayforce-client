@@ -3,7 +3,7 @@ isort==5.13.2
 mypy==1.10.0
 pytest==8.2.0
 responses==0.25.0
-tox==3.28.0
+tox==4.15.0
 black==24.4.2
 click==8.0.4
 types-paramiko==3.4.0.20240423
