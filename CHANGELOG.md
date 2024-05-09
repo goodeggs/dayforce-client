@@ -1,3 +1,10 @@
+# 2.0.1 (Sep 2022)
+
+ - Support for `Dayforce` release 241
+ - Bump dependencies
+
+# 2.0.0 (Sep 2022)
+
 # 1.1.0 (Apr 2022)
 
  - Support for `Dayforce` release 62
