@@ -12,6 +12,11 @@ dayforce-client is a python SDK for interfacing with the Dayforce REST API and S
 ```bash
 $ pip3 install dayforce-client
 ```
+or install the latest version directly
+
+```bash
+$ pip install git+https://github.com/goodeggs/dayforce-client@2.0.1
+```
 
 ## Basic Usage (Rest API)
 
