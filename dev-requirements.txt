@@ -5,6 +5,6 @@ pytest==8.2.0
 responses==0.25.0
 tox==4.15.0
 black==24.4.2
-click==8.0.4
+click==8.1.7
 types-paramiko==3.4.0.20240423
 types-requests==2.27.1
