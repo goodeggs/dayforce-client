@@ -1,7 +1,7 @@
 flake8==5.0.4
 isort==5.13.2
 mypy==1.10.0
-pytest==8.2.0
+pytest==8.3.3
 responses==0.25.0
 tox==4.15.0
 black==24.4.2
