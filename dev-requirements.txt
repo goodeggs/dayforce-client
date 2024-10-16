@@ -7,4 +7,4 @@ tox==4.15.0
 black==24.4.2
 click==8.0.4
 types-paramiko==3.4.0.20240423
-types-requests==2.27.1
+types-requests==2.32.0.20241016
